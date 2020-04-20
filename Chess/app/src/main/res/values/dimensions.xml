@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="tile_width">45dp</dimen>
+    <dimen name="tile_height">45dp</dimen>
+    <dimen name="row_width">360dp</dimen>
+</resources>

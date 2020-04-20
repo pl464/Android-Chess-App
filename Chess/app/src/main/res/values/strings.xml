@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Chess</string>
+    <string name="turn_num">Turn#: 0</string>
+    <string name="turn_color">WhitE</string>
 </resources>
