@@ -36,6 +36,7 @@
         android:id="@+id/board"
         android:layout_width="360dp"
         android:layout_height="360dp"
+        android:background="@drawable/chessboard"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
