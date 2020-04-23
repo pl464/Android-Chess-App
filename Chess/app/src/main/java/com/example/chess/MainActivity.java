@@ -20,7 +20,43 @@ public class MainActivity extends AppCompatActivity {
     private static String currTile = null;
     private static String destTile = null;
     private static boolean selected = false;
+    
+    private ArrayList<String> pastMoves = new ArrayList<String>();
 
+    public void saveGame(String filename) {
+        try {
+            //pastMoves.add("move1");
+            //pastMoves.add("move2");
+            //pastMoves.add("move3");
+            FileOutputStream fos = openFileOutput(filename, MODE_PRIVATE);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(pastMoves);
+            oos.close();
+            fos.close();
+            //System.out.println("save successful");
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadGame(String filename) {
+        try {
+            FileInputStream fis = openFileInput(filename);
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            pastMoves = (ArrayList<String>) ois.readObject();
+            ois.close();
+            fis.close();
+            //System.out.println("load successful");
+            //for (String s : pastMoves) {
+            //    System.out.println(s);
+            //}
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         board = new Piece[8][8];
         initialize();
         drawBoard();
+        //saveGame("test");
+        //loadGame("test");
     }
 
     private void drawBoard(){
@@ -411,6 +449,8 @@ public class MainActivity extends AppCompatActivity {
                 board[endRow][endCol] = new Queen(start.color);
             }
         }
+        
+        pastMoves.add(s);
         return;
     }
 
