@@ -1,16 +1,12 @@
 package com.example.chess;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.annotation.SuppressLint;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -18,14 +14,21 @@ public class MainActivity extends AppCompatActivity {
 
     private TableLayout tableLayout;
     private static Piece[][] board;
+    private int turn = 1;
+    private TextView turnNum;
+    private TextView turnColor;
+    private static String currTile = null;
+    private static String destTile = null;
+    private static boolean selected = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("me", "HELLO"); //go to logcat and search "me" in the Debug menu to find this message
+        //Log.d("me", "HELLO"); //go to logcat and search "me" in the Debug menu to find this message
         tableLayout = findViewById(R.id.board);
-
+        turnNum = findViewById(R.id.turnNum);
+        turnColor = findViewById(R.id.turnColor);
         board = new Piece[8][8];
         initialize();
         drawBoard();
@@ -35,8 +38,8 @@ public class MainActivity extends AppCompatActivity {
         int tileWidth = Math.round(getResources().getDimension(R.dimen.tile_width));
         int tileHeight = Math.round(getResources().getDimension(R.dimen.tile_height));
         //int rowWidth = Math.round(getResources().getDimension(R.dimen.row_width));
-
         for (int i = 1; i <= 8; i++){
+            tableLayout.removeView(findViewById(i));
             TableRow tableRow = new TableRow(this);
             //tableRow.setLayoutParams(new TableRow.LayoutParams(rowWidth, tileHeight));
             tableRow.setId(i);
@@ -74,10 +77,45 @@ public class MainActivity extends AppCompatActivity {
                 //add the ImageView to the current TableRow
                 //TableRow tr = tableRow.findViewById(i);
                 tableRow.addView(imageView);
-                //for testing purposes
+                //whenever a tile is clicked, if there is no piece do nothing; if no tile was selected prior set this to
+                //the current tile selected; otherwise this is a destination tile
                 imageView.setOnClickListener((v)->{
+                    char c = (turn % 2 == 1) ? 'w' : 'b';
                     String id = Integer.toString(v.getId());
-                    Log.d("me", "My ID is: " + id);
+                    Piece curr = board[id.charAt(0)-'0'-1][id.charAt(1)-'0'-1];
+                    //Log.d("me", "My ID is: " + id);
+                    if (currTile == null && p == null) {}
+                    else if (currTile == null) {
+                        if (curr.color != c) {
+                            return;
+                        } else {
+                            currTile = convert(id);
+                        }
+                    }
+                    else if (destTile == null){
+                        curr = board[id.charAt(0)-'0'-1][id.charAt(1)-'0'-1];
+                        if (curr != null && curr.color == c){
+                            currTile = convert(id); //if player selects another piece of their own color, that becomes the starting piece
+                        } else {
+                            destTile = convert(id);
+                        }
+                    }
+                   // else if (destTile == null) destTile = convert(id);
+                    //For testing:
+                    Log.d("me", currTile + " " + destTile);
+
+                    //handle highlighting the selected tile
+                    if (currTile != null && destTile != null) {
+                        if (!play(currTile, destTile)) {
+                            clearSelection();
+                            return;
+                        }
+                    }
+                    if (selected){ //if something was already selected, de-select everything before selecting current icon
+                        clearSelection();
+                    }
+                    if (p != null) imageView.setBackgroundResource(R.drawable.tile_border);
+                    selected = true;
                 });
                 String id = Integer.toString(i) + Integer.toString(j);
                 imageView.setId(Integer.parseInt(id));
@@ -86,7 +124,41 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static void initialize() {
+    private void clearSelection(){
+        for (int r = 1; r <= 8; r++){
+            for (int s = 1; s <= 8; s++){
+                int temp = Integer.parseInt(Integer.toString(r)+Integer.toString(s));
+                tableLayout.findViewById(temp).setBackgroundColor(0);
+            }
+        }
+    }
+    //converts image id (11, 12, ..., 88) to board identifier used by chess program (a1, a2, ... h8)
+    private String convert(String imageId){
+        String chessId = "";
+        switch (imageId.charAt(1)){
+            case '1': chessId += "a"; break;
+            case '2': chessId += "b"; break;
+            case '3': chessId += "c"; break;
+            case '4': chessId += "d"; break;
+            case '5': chessId += "e"; break;
+            case '6': chessId += "f"; break;
+            case '7': chessId += "g"; break;
+            case '8': chessId += "h"; break;
+        }
+        switch (imageId.charAt(0)){
+            case '1': chessId += "8"; break;
+            case '2': chessId += "7"; break;
+            case '3': chessId += "6"; break;
+            case '4': chessId += "5"; break;
+            case '5': chessId += "4"; break;
+            case '6': chessId += "3"; break;
+            case '7': chessId += "2"; break;
+            case '8': chessId += "1"; break;
+        }
+        return chessId;
+    }
+
+    public void initialize() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (i == 0) {
@@ -137,39 +209,120 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //prints the underlying Piece[][] board to Logcat
+    public static void printBoard() {
+        for (int i = 0; i < 8; i++) {
+            String s = "";
+            for (int j = 0; j < 8; j++) {
+                if (board[i][j] == null) {
+                    s += ((i + j) % 2 == 0) ? "   " : "## ";
+                }
+                else {
+                    s+= String.valueOf(board[i][j].color);
+                    s+=board[i][j].type + " ";
+                }
+            }
+            s+= 8 - i;
+            Log.d("me",s);
+        }
+        //System.out.println(" a  b  c  d  e  f  g  h\n");
+    }
+
+    //called when a move attempts to be made by the player. returns TRUE if a move was successfully made, FALSE otherwise
+    public boolean play(String curr, String dest){
+        String move = curr + " " + dest;
+		//while (true) {
+            //check if the player has no valid moves
+        if (isCheckmate((turn % 2 == 1) ? 'w' : 'b')) {
+            Log.d("me","draw");
+           // break;
+        }
+        //get user input
+        System.out.print(((turn % 2 == 1) ? "White" : "Black") + "'s move: ");
+
+        //TODO Implement Draw and Resign options
+        if (move.equals("draw")) {
+           // break;
+        }
+        if (move.equals("resign")) {
+            System.out.print(((turn % 2 == 1) ? "Black" : "White") + " wins");
+           // break;
+        }
+
+        //move the piece if allowed and show the updated chessboard
+        if (isIllegal(move, turn)) {
+            Log.d("me","Illegal move, try again\n");
+            currTile = null;
+            destTile = null;
+            return false;
+            //continue;
+        }
+        Log.d("me","This move is legal!");
+        makeMove(move, turn);
+
+        //printBoard();
+        drawBoard();
+        selected = false;
+        currTile = null;
+        destTile = null;
+
+        //TODO Display something upon victory
+        if (isCheck((turn % 2 == 1) ? 'b' : 'w')) {
+            if (isCheckmate((turn % 2 == 1) ? 'b' : 'w')) {
+                System.out.println("Checkmate\n");
+                System.out.print(((turn % 2 == 1) ? "White" : "Black") + " wins");
+                //break;
+            }
+            else {
+                System.out.println("Check\n");
+            }
+        }
+        if (turn % 2 == 1) turnColor.setText("Black's Turn");
+        else turnColor.setText("White's Turn");
+        turn++;
+        turnNum.setText("Turn#: " + turn);
+        return true;
+    }
     /**
      * Method to determine whether a move is illegal.
      * @param s The move entered by the user in chess notation.
      * @param i Odd number means white's turn, even number means black's turn.
      * @return Returns true if the move is valid, false if the move is invalid.
      */
-    public static boolean isIllegal(String s, int i) {
+    public boolean isIllegal(String s, int i) {
         //parse user input
         int startCol = s.toLowerCase().charAt(0) - 97;
         int startRow = 8 - Character.getNumericValue(s.charAt(1));
         int endCol = s.toLowerCase().charAt(3) - 97;
         int endRow = 8 - Character.getNumericValue(s.charAt(4));
         Piece start = board[startRow][startCol];
+        Log.d("me", "the piece is " + start.color + start.type + " located at " + startRow + startCol);
         Piece end = board[endRow][endCol];
 
         //check that starting piece exists
         if (start == null) {
+            Log.d("me", "start is null");
             return true;
         }
 
         //check that starting piece is player's color
         char c = (i % 2 == 1) ? 'w' : 'b';
         if (start.color != c) {
+            Log.d("me", "it's not this color's turn. the color is " + start.color + " but it's supposed to be " + c);
             return true;
         }
 
         //check that ending piece, if exists, is opponent's color
         if (end != null && end.color == c) {
+            Log.d("me", "This piece is of your own color");
+            currTile = s.charAt(3) + "" + s.charAt(4); //if this piece is the player's own color, make this the piece of interest
+            destTile = null;
             return true;
         }
 
         //check that piece movement is legal
         if (start.validMove(board, startCol, startRow, endCol, endRow, i) == false) {
+            Log.d("me", "this move is not valid");
             return true;
         }
 
@@ -191,7 +344,7 @@ public class MainActivity extends AppCompatActivity {
      * @param s The move entered by the user in chess notation.
      * @param i Odd number means white's turn, even number means black's turn.
      */
-    public static void makeMove(String s, int i) {
+    public void makeMove(String s, int i) {
         //parse user input
         int startCol = s.toLowerCase().charAt(0) - 97;
         int startRow = 8 - Character.getNumericValue(s.charAt(1));
@@ -266,7 +419,7 @@ public class MainActivity extends AppCompatActivity {
      * @param color The color of the king under consideration.
      * @return Returns true if the king is checkmated, false otherwise.
      */
-    public static boolean isCheckmate(char color) {
+    public boolean isCheckmate(char color) {
         //test possible moves to see if they end the check; if none, checkmate detected
         for (int j = 0; j < 8; j++) {
             for (int k = 0; k < 8; k++) {
@@ -455,7 +608,7 @@ public class MainActivity extends AppCompatActivity {
      * @param xPos The column index (0-7) of the starting tile of p.
      * @return Returns an ArrayList of integer arrays.
      */
-    public static ArrayList<int[]> getPossMoves(Piece p, int yPos, int xPos){
+    public ArrayList<int[]> getPossMoves(Piece p, int yPos, int xPos){
         ArrayList<int[]> possMoves = new ArrayList<int[]>();
         switch (p.type) {
             case 'B':
@@ -534,7 +687,7 @@ public class MainActivity extends AppCompatActivity {
                             continue;}
                         if (board[y][x].color != p.color) {
                             possMoves.add(new int[] {y, x});
-                            continue;}
+                        }
                     }
                 }
                 break;
