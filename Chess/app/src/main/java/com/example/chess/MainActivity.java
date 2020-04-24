@@ -1,8 +1,14 @@
 package com.example.chess;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.DragEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -25,24 +31,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Log.d("me", "HELLO"); //go to logcat and search "me" in the Debug menu to find this message
+
         tableLayout = findViewById(R.id.board);
         turnNum = findViewById(R.id.turnNum);
         turnColor = findViewById(R.id.turnColor);
+
         board = new Piece[8][8];
-        initialize();
-        drawBoard();
+        initialize(); //initializes the underlying board
+        drawBoard(); //draws in tableLayout according to board
     }
 
+    //re-draws the display according to board and sets Listeners for each ImageView
     private void drawBoard(){
         int tileWidth = Math.round(getResources().getDimension(R.dimen.tile_width));
         int tileHeight = Math.round(getResources().getDimension(R.dimen.tile_height));
-        //int rowWidth = Math.round(getResources().getDimension(R.dimen.row_width));
+
+        //Go through all the entries in board[][] and draw an ImageView as a TableRow child in each
         for (int i = 1; i <= 8; i++){
             tableLayout.removeView(findViewById(i));
             TableRow tableRow = new TableRow(this);
             //tableRow.setLayoutParams(new TableRow.LayoutParams(rowWidth, tileHeight));
-            tableRow.setId(i);
+            tableRow.setId(i); //set each row to have a TableLayout id of 1, 2, ... 8
             tableLayout.addView(tableRow);
             tableRow.setLayoutParams(new TableRow.LayoutParams(
                     TableRow.LayoutParams.MATCH_PARENT,
@@ -50,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
             for (int j = 1; j <= 8; j++){
                 //NOTE: indices i and j start at 1 to generate indices 11, 12, 13, ..., 88 for tableLayout children (0 gets deleted at the beginning),
-                //but the underlying board[][] uses indices starting at 0 and 0 because it uses a 2D array. So, 1 must be subtracted from these indices
+                //but the underlying Piece[][] board uses indices starting at 0 and 0 because it uses a 2D array. So, 1 must be subtracted from these indices
                 //to refer to the board in the line below.
                 Piece p = board[i-1][j-1];
                 ImageView imageView = new ImageView(this);
@@ -75,55 +84,100 @@ public class MainActivity extends AppCompatActivity {
                     else if (p.type == 'R') imageView.setImageResource(R.drawable.ic_white_rook);
                 }
                 //add the ImageView to the current TableRow
-                //TableRow tr = tableRow.findViewById(i);
                 tableRow.addView(imageView);
-                //whenever a tile is clicked, if there is no piece do nothing; if no tile was selected prior set this to
-                //the current tile selected; otherwise this is a destination tile
+                //Now set the clickListeners for each ImageView
                 imageView.setOnClickListener((v)->{
                     char c = (turn % 2 == 1) ? 'w' : 'b';
                     String id = Integer.toString(v.getId());
                     Piece curr = board[id.charAt(0)-'0'-1][id.charAt(1)-'0'-1];
-                    //Log.d("me", "My ID is: " + id);
+
                     if (currTile == null && p == null) {}
                     else if (currTile == null) {
-                        if (curr.color != c) {
-                            return;
-                        } else {
-                            currTile = convert(id);
-                        }
+                        if (curr.color != c) return;
+                        else currTile = convert(id);
                     }
                     else if (destTile == null){
                         curr = board[id.charAt(0)-'0'-1][id.charAt(1)-'0'-1];
                         if (curr != null && curr.color == c){
                             currTile = convert(id); //if player selects another piece of their own color, that becomes the starting piece
-                        } else {
-                            destTile = convert(id);
-                        }
+                        } else destTile = convert(id);
                     }
-                   // else if (destTile == null) destTile = convert(id);
                     //For testing:
                     Log.d("me", currTile + " " + destTile);
 
-                    //handle highlighting the selected tile
+                    //Handle the setting of the selection border
                     if (currTile != null && destTile != null) {
-                        if (!play(currTile, destTile)) {
-                            clearSelection();
+                        if (!play(currTile, destTile)) { //process the clicked move
+                            clearSelection(); //if it didn't work, de-select everything
                             return;
                         }
                     }
-                    if (selected){ //if something was already selected, de-select everything before selecting current icon
-                        clearSelection();
-                    }
+                    //if something was already selected, de-select everything before selecting current icon
+                    if (selected) clearSelection();
+                    //otherwise, set the border
                     if (p != null) imageView.setBackgroundResource(R.drawable.tile_border);
                     selected = true;
                 });
+                //TODO: select the border of drag and drop pieces
+                imageView.setOnLongClickListener((v)->{
+                    //don't react if the selected piece is the incorrect color
+                    char c = (turn % 2 == 1) ? 'w' : 'b';
+                    String id = Integer.toString(v.getId());
+                    Piece curr = board[id.charAt(0)-'0'-1][id.charAt(1)-'0'-1];
+                    if (curr.color != c) return true;
+
+                    String clipText = Integer.toString(v.getId());
+                    ClipData.Item item = new ClipData.Item(clipText);
+                    ClipData data = new ClipData(clipText, new String[] {ClipDescription.MIMETYPE_TEXT_PLAIN}, item);
+                    View.DragShadowBuilder dsb = new View.DragShadowBuilder(v);
+                    v.startDragAndDrop(data, dsb, v, 0);
+                    v.setVisibility(View.INVISIBLE);
+                    return true;
+                });
+                imageView.setOnDragListener((v, e)->{
+                    int action = e.getAction();
+                    switch(action){
+                        case DragEvent.ACTION_DRAG_STARTED:
+                            return e.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
+                        case DragEvent.ACTION_DRAG_ENTERED:
+                            return true;
+                        case DragEvent.ACTION_DRAG_LOCATION:
+                            return true;
+                        case DragEvent.ACTION_DRAG_EXITED:
+                            return true;
+                        case DragEvent.ACTION_DROP:
+                            ClipData.Item item = e.getClipData().getItemAt(0);
+                            currTile = convert(item.getText().toString());
+                            destTile = convert(Integer.toString(v.getId()));
+                            Log.d("me", currTile + " " + destTile);
+                            //If the destination is itself or if the turn was unsuccessful, undo the drag
+                            if (currTile.equals(destTile) || !play(currTile, destTile)){
+                                tableLayout.findViewById(
+                                        Integer.parseInt(item.getText().toString())
+                                ).setVisibility(View.VISIBLE);
+                                return false;
+                            }
+                            return true;
+                        case DragEvent.ACTION_DRAG_ENDED:
+                            if (!e.getResult()){
+                                View view = (View)e.getLocalState();
+                                view.setVisibility(View.VISIBLE);
+                            }
+                            return true;
+                        default:
+                            Log.e("me", "Drag Error");
+                            break;
+                    }
+                    return true;
+                });
+                //give this ImageView an id of format 11, 12, ... 88, with 11 being the top-leftmost entry in tableLayout.
                 String id = Integer.toString(i) + Integer.toString(j);
                 imageView.setId(Integer.parseInt(id));
             }
-
         }
     }
 
+    //helper method to remove the selection border from all ImageViews
     private void clearSelection(){
         for (int r = 1; r <= 8; r++){
             for (int s = 1; s <= 8; s++){
@@ -132,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    //converts image id (11, 12, ..., 88) to board identifier used by chess program (a1, a2, ... h8)
+    //helper method to convert ImageView id (11, 12, ..., 88) to board identifier used by chess program (a1, a2, ... h8)
     private String convert(String imageId){
         String chessId = "";
         switch (imageId.charAt(1)){
@@ -158,6 +212,7 @@ public class MainActivity extends AppCompatActivity {
         return chessId;
     }
 
+    //helper method to initialize the underlying Piece[][] board
     public void initialize() {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
