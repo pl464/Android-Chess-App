@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -19,6 +20,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,7 +32,8 @@ public class MainActivity extends AppCompatActivity {
     private static String currTile = null;
     private static String destTile = null;
     private static boolean selected = false;
-    
+    private Button aiButton;
+
     private ArrayList<String> pastMoves = new ArrayList<String>();
 
     public void saveGame(String filename) {
@@ -75,6 +78,13 @@ public class MainActivity extends AppCompatActivity {
         tableLayout = findViewById(R.id.board);
         turnNum = findViewById(R.id.turnNum);
         turnColor = findViewById(R.id.turnColor);
+        aiButton = findViewById(R.id.ai_button);
+
+        aiButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                makeAIMove();
+            }
+        });
 
         board = new Piece[8][8];
         initialize(); //initializes the underlying board
@@ -142,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
                             currTile = convert(id); //if player selects another piece of their own color, that becomes the starting piece
                         } else destTile = convert(id);
                     }
-                    //For testing:
-                    Log.d("me", currTile + " " + destTile);
 
                     //Handle the setting of the selection border
                     if (currTile != null && destTile != null) {
@@ -226,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     //helper method to convert ImageView id (11, 12, ..., 88) to board identifier used by chess program (a1, a2, ... h8)
     private String convert(String imageId){
         String chessId = "";
@@ -352,7 +361,6 @@ public class MainActivity extends AppCompatActivity {
             return false;
             //continue;
         }
-        Log.d("me","This move is legal!");
         makeMove(move, turn);
 
         //printBoard();
@@ -391,7 +399,6 @@ public class MainActivity extends AppCompatActivity {
         int endCol = s.toLowerCase().charAt(3) - 97;
         int endRow = 8 - Character.getNumericValue(s.charAt(4));
         Piece start = board[startRow][startCol];
-        Log.d("me", "the piece is " + start.color + start.type + " located at " + startRow + startCol);
         Piece end = board[endRow][endCol];
 
         //check that starting piece exists
@@ -831,5 +838,52 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return possMoves;
+    }
+
+    public void makeAIMove(){
+        //get a list of possible moves
+        ArrayList<String[]> options = new ArrayList<String[]>();
+        char c = (turn % 2 == 1) ? 'w' : 'b';
+        for (int i = 0; i < 8; i++){
+            for (int j = 0; j < 8; j++){
+                Piece p0 = board[i][j];
+                if (p0 == null || p0.color != c) {
+                    continue;
+                }
+                String currTile = Integer.toString(i+1) + Integer.toString(j+1);
+                String[] move = new String[2];
+                move[0] = currTile;
+                ArrayList<int[]> possMoves = getPossMoves(p0, i, j);
+                //try the move and see if it results in a check
+                for (int[] possMove : possMoves){
+                    int testY = possMove[0];
+                    int testX = possMove[1];
+                    Piece p1 = board[testY][testX];
+                    board[testY][testX] = p0;
+                    board[i][j] = null;
+                    if (isCheck(c)) {
+                        board[i][j] = p0;
+                        board[testY][testX] = p1;
+                        continue;
+                    }
+                    else {
+                        move[1] = Integer.toString(testY+1) + Integer.toString(testX+1);
+                        //Log.d("me", "Adding move " + move[0] + " " + move[1]);
+                        options.add(move);
+                        board[i][j] = p0;
+                        board[testY][testX] = p1;
+                    }
+                }
+            }
+        }
+        //choose a move at random
+        int numOptions = options.size();
+        Random rand = new Random();
+        int value = rand.nextInt(numOptions);
+        String[] randMove = options.get(value);
+        //make the move
+        //Log.d("me", "attempting random move " + randMove[0] + randMove[1]);
+        play(convert(randMove[0]), convert(randMove[1]));
+        return;
     }
 }

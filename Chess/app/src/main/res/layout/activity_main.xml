@@ -41,4 +41,16 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/ai_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="AI Move"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@+id/board"
+        app:layout_constraintLeft_toRightOf="@id/turnColor"
+        tools:layout_constraintBottom_toTopOf="@id/board" />
 </androidx.constraintlayout.widget.ConstraintLayout>
