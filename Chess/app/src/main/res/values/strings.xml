@@ -2,4 +2,12 @@
     <string name="app_name">Chess</string>
     <string name="turn_num">Turn#: 0</string>
     <string name="turn_color">White\'s Turn</string>
+    <string name="date_sort">Sort Games By Date</string>
+    <string name="title_sort">Sort Games By Title</string>
+    <string name="go_back">Return Home</string>
+    <string name="watch_game">Play Recording</string>
+    <string name="new_game">New Game</string>
+    <string name="previous_games">Previous Games</string>
+    <string name="title">Chess</string>
+    <string name="next_move">Next Move</string>
 </resources>
