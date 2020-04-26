@@ -26,13 +26,19 @@ public class MainActivity extends AppCompatActivity {
 
     private TableLayout tableLayout;
     private static Piece[][] board;
+
     private int turn = 1;
     private TextView turnNum;
     private TextView turnColor;
+
     private static String currTile = null;
     private static String destTile = null;
     private static boolean selected = false;
+
     private Button aiButton;
+    private Button undoButton;
+    private static String undoMove = null;
+    private static Piece lastPieceTaken;
 
     private ArrayList<String> pastMoves = new ArrayList<String>();
 
@@ -79,10 +85,17 @@ public class MainActivity extends AppCompatActivity {
         turnNum = findViewById(R.id.turnNum);
         turnColor = findViewById(R.id.turnColor);
         aiButton = findViewById(R.id.ai_button);
+        undoButton = findViewById(R.id.undo_button);
 
         aiButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 makeAIMove();
+            }
+        });
+        undoButton.setEnabled(false);
+        undoButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                undoMove();
             }
         });
 
@@ -355,7 +368,7 @@ public class MainActivity extends AppCompatActivity {
 
         //move the piece if allowed and show the updated chessboard
         if (isIllegal(move, turn)) {
-            Log.d("me","Illegal move, try again\n");
+            //Log.d("me","Illegal move " + move + " try again\n");
             currTile = null;
             destTile = null;
             return false;
@@ -366,6 +379,8 @@ public class MainActivity extends AppCompatActivity {
         //printBoard();
         drawBoard();
         selected = false;
+        if (!undoButton.isEnabled()) undoButton.setEnabled(true);
+        undoMove = dest + " " + curr;
         currTile = null;
         destTile = null;
 
@@ -380,9 +395,9 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("Check\n");
             }
         }
-        if (turn % 2 == 1) turnColor.setText("Black's Turn");
-        else turnColor.setText("White's Turn");
         turn++;
+        if (turn % 2 == 1) turnColor.setText("White's Turn");
+        else turnColor.setText("Black's Turn");
         turnNum.setText("Turn#: " + turn);
         return true;
     }
@@ -400,6 +415,7 @@ public class MainActivity extends AppCompatActivity {
         int endRow = 8 - Character.getNumericValue(s.charAt(4));
         Piece start = board[startRow][startCol];
         Piece end = board[endRow][endCol];
+        lastPieceTaken = end;
 
         //check that starting piece exists
         if (start == null) {
@@ -424,7 +440,7 @@ public class MainActivity extends AppCompatActivity {
 
         //check that piece movement is legal
         if (start.validMove(board, startCol, startRow, endCol, endRow, i) == false) {
-            Log.d("me", "this move is not valid");
+            Log.d("me", "This piece can't move here");
             return true;
         }
 
@@ -819,11 +835,13 @@ public class MainActivity extends AppCompatActivity {
             case 'p':
                 int y; int x = xPos;
                 if (p.color == 'b') {
-                    y = yPos + 1; if (y <= 7 && board[y][x] == null) possMoves.add(new int[] {y, xPos});
-                    if (yPos == 1 && board[3][xPos] == null) possMoves.add(new int[] {3, xPos});
+                    y = yPos + 1;
+                    if (y <= 7 && board[y][x] == null) possMoves.add(new int[] {y, xPos});
+                    if (yPos == 1 && board[2][xPos] == null && board[3][xPos] == null) possMoves.add(new int[] {3, xPos});
                 } else {
-                    y = yPos - 1; if (y >= 0 && board[y][x] == null) possMoves.add(new int[] {y, xPos});
-                    if (yPos == 6 && board[4][xPos] == null) possMoves.add(new int[] {4, xPos});
+                    y = yPos - 1;
+                    if (y >= 0 && board[y][x] == null) possMoves.add(new int[] {y, xPos});
+                    if (yPos == 6 && board[5][xPos] == null && board[4][xPos] == null) possMoves.add(new int[] {4, xPos});
                 }
                 if (x != 7) {
                     x = xPos + 1;
@@ -885,5 +903,24 @@ public class MainActivity extends AppCompatActivity {
         //Log.d("me", "attempting random move " + randMove[0] + randMove[1]);
         play(convert(randMove[0]), convert(randMove[1]));
         return;
+    }
+
+    public void undoMove(){
+        turn--;
+        //remove the last turn
+        pastMoves.remove(pastMoves.size()-1);
+        makeMove(undoMove, turn);
+        //restore the last piece taken
+        int recoverCol = undoMove.toLowerCase().charAt(0) - 97;
+        int recoverRow = 8 - Character.getNumericValue(undoMove.charAt(1));
+        board[recoverRow][recoverCol] = lastPieceTaken;
+        //now, remove the undo turn added by makeMove();
+        pastMoves.remove(pastMoves.size()-1);
+        drawBoard();
+        //update game info
+        if (turn % 2 == 1) turnColor.setText("White's Turn");
+        else turnColor.setText("Black's Turn");
+        turnNum.setText("Turn#: " + turn);
+        undoButton.setEnabled(false);
     }
 }

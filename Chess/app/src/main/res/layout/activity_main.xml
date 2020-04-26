@@ -46,11 +46,22 @@
         android:id="@+id/ai_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_marginBottom="16dp"
-        android:text="AI Move"
+        android:text="@string/ai_button_label"
         android:textAllCaps="false"
         app:layout_constraintBottom_toTopOf="@+id/board"
-        app:layout_constraintLeft_toRightOf="@id/turnColor"
+        app:layout_constraintStart_toEndOf="@+id/turnNum"
         tools:layout_constraintBottom_toTopOf="@id/board" />
+
+    <Button
+        android:id="@+id/undo_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="@string/undo_button_label"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@id/board"
+        app:layout_constraintLeft_toRightOf="@id/ai_button" />
 </androidx.constraintlayout.widget.ConstraintLayout>
