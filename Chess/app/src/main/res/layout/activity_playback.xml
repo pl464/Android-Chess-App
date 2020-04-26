@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/turnNum"
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+        android:text="@string/turn_num"
+        app:layout_constraintBottom_toTopOf="@id/turnColor"
+        app:layout_constraintLeft_toLeftOf="@id/boardBorder" />
+
+    <TextView
+        android:id="@+id/turnColor"
+        android:layout_width="90dp"
+        android:layout_height="30dp"
+        android:text="@string/turn_color"
+        app:layout_constraintBottom_toTopOf="@id/boardBorder"
+        app:layout_constraintLeft_toLeftOf="@id/boardBorder" />
+
+    <TableLayout
+        android:id="@+id/boardBorder"
+        android:layout_width="362dp"
+        android:layout_height="362dp"
+        android:background="@drawable/border"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TableLayout
+        android:id="@+id/board"
+        android:layout_width="360dp"
+        android:layout_height="360dp"
+        android:background="@drawable/chessboard"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
+        android:id="@+id/nextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/next_move"
+        app:layout_constraintRight_toRightOf="@+id/board"
+        app:layout_constraintTop_toTopOf="@+id/turnNum" />
+</androidx.constraintlayout.widget.ConstraintLayout>
