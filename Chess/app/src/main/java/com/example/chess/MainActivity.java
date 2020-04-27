@@ -387,12 +387,12 @@ public class MainActivity extends AppCompatActivity {
         //TODO Display something upon victory
         if (isCheck((turn % 2 == 1) ? 'b' : 'w')) {
             if (isCheckmate((turn % 2 == 1) ? 'b' : 'w')) {
-                System.out.println("Checkmate\n");
-                System.out.print(((turn % 2 == 1) ? "White" : "Black") + " wins");
+                Log.d("me","Checkmate\n");
+                Log.d("me", ((turn % 2 == 1) ? "White" : "Black") + " wins");
                 //break;
             }
             else {
-                System.out.println("Check\n");
+                Log.d("me","Check\n");
             }
         }
         turn++;
