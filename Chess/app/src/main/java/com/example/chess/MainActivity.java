@@ -1,6 +1,7 @@
 package com.example.chess;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -8,9 +9,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -348,14 +353,10 @@ public class MainActivity extends AppCompatActivity {
     //called when a move attempts to be made by the player. returns TRUE if a move was successfully made, FALSE otherwise
     public boolean play(String curr, String dest){
         String move = curr + " " + dest;
-		//while (true) {
-            //check if the player has no valid moves
         if (isCheckmate((turn % 2 == 1) ? 'w' : 'b')) {
             Log.d("me","draw");
            // break;
         }
-        //get user input
-        System.out.print(((turn % 2 == 1) ? "White" : "Black") + "'s move: ");
 
         //TODO Implement Draw and Resign options
         if (move.equals("draw")) {
@@ -389,7 +390,8 @@ public class MainActivity extends AppCompatActivity {
             if (isCheckmate((turn % 2 == 1) ? 'b' : 'w')) {
                 Log.d("me","Checkmate\n");
                 Log.d("me", ((turn % 2 == 1) ? "White" : "Black") + " wins");
-                //break;
+                if (turn % 2 == 1) showEndGamePopup('w');
+                else showEndGamePopup('b');
             }
             else {
                 Log.d("me","Check\n");
@@ -922,5 +924,42 @@ public class MainActivity extends AppCompatActivity {
         else turnColor.setText("Black's Turn");
         turnNum.setText("Turn#: " + turn);
         undoButton.setEnabled(false);
+    }
+
+    private void showEndGamePopup(char code){
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = layoutInflater.inflate(R.layout.endgame_popup, null);
+        PopupWindow popupWindow = new PopupWindow(popupView,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT);
+        popupWindow.showAtLocation(tableLayout, Gravity.CENTER, 0, 0);
+
+        TextView endGameMessage = popupView.findViewById(R.id.end_game_message);
+        switch (code){
+            case 'w':
+                endGameMessage.setText("White wins!");
+                break;
+            case 'b':
+                endGameMessage.setText("Black wins!");
+                break;
+            case 'd':
+                endGameMessage.setText("Draw!");
+                break;
+        }
+
+        Button yesButton = (Button)popupView.findViewById(R.id.yes_button);
+        Button noButton = (Button)popupView.findViewById(R.id.no_button);
+        yesButton.setOnClickListener((l)->{
+                saveGame("test");
+                popupWindow.dismiss();
+                recreate();
+            }
+        );
+        noButton.setOnClickListener((l)->{
+            popupWindow.dismiss();
+            recreate();
+        });
     }
 }
