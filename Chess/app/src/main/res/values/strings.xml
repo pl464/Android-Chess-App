@@ -4,13 +4,10 @@
     <string name="turn_color">White\'s Turn</string>
     <string name="ai_button_label">AI Move</string>
     <string name="undo_button_label">Undo</string>
-=======
     <string name="date_sort">Sort Games By Date</string>
     <string name="title_sort">Sort Games By Title</string>
-    <string name="go_back">Return Home</string>
-    <string name="watch_game">Play Recording</string>
+    <string name="play_recording">Play Recording</string>
     <string name="new_game">New Game</string>
     <string name="previous_games">Previous Games</string>
-    <string name="title">Chess</string>
     <string name="next_move">Next Move</string>
 </resources>

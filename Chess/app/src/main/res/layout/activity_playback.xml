@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".PlaybackActivity">
 
     <TextView
         android:id="@+id/turnNum"
@@ -47,6 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/next_move"
+        android:onClick="nextMove"
         app:layout_constraintRight_toRightOf="@+id/board"
         app:layout_constraintTop_toTopOf="@+id/turnNum" />
 </androidx.constraintlayout.widget.ConstraintLayout>

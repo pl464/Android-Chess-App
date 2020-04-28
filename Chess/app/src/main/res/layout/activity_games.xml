@@ -4,13 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlaybackActivity">
+    tools:context=".GamesActivity">
 
     <Button
         android:id="@+id/dateButton"
         android:layout_width="180dp"
         android:layout_height="40dp"
         android:text="@string/date_sort"
+        android:onClick="dateSort"
         app:layout_constraintBottom_toTopOf="@id/gameList"
         app:layout_constraintLeft_toLeftOf="@id/gameList" />
 
@@ -19,32 +20,26 @@
         android:layout_width="180dp"
         android:layout_height="40dp"
         android:text="@string/title_sort"
+        android:onClick="titleSort"
         app:layout_constraintBottom_toTopOf="@id/gameList"
         app:layout_constraintLeft_toRightOf="@id/dateButton" />
-
-    <Button
-        android:id="@+id/backButton"
-        android:layout_width="180dp"
-        android:layout_height="40dp"
-        android:text="@string/go_back"
-        app:layout_constraintTop_toBottomOf="@id/gameList"
-        app:layout_constraintLeft_toLeftOf="@id/gameList" />
 
     <Button
         android:id="@+id/watchButton"
         android:layout_width="180dp"
         android:layout_height="40dp"
-        android:text="@string/watch_game"
+        android:text="@string/play_recording"
+        android:onClick="showPlayback"
         app:layout_constraintTop_toBottomOf="@id/gameList"
-        app:layout_constraintLeft_toRightOf="@id/backButton" />
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
 
     <ListView
         android:id="@+id/gameList"
         android:layout_width="360dp"
-        android:layout_height="540dp"
+        android:layout_height="420dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
