@@ -5,7 +5,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.ClipData;
 import android.content.ClipDescription;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
@@ -27,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -515,26 +515,7 @@ public class MainActivity extends AppCompatActivity {
         //pawn promotion
         int colorRow = (start.color == 'w') ? 0 : 7;
         if (start.type == 'p' && endRow == colorRow) {
-            if (s.length() > 6) {
-                switch (s.charAt(6)) {
-                    case 'R':
-                        board[endRow][endCol] = new Rook(start.color);
-                        break;
-                    case 'N':
-                        board[endRow][endCol] = new Knight(start.color);
-                        break;
-                    case 'B':
-                        board[endRow][endCol] = new Bishop(start.color);
-                        break;
-                    case 'Q':
-                    default:
-                        board[endRow][endCol] = new Queen(start.color);
-                        break;
-                }
-            }
-            else {
-                board[endRow][endCol] = new Queen(start.color);
-            }
+            promotePawn(start.color, endRow, endCol);
         }
         
         pastMoves.add(s);
@@ -988,4 +969,95 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
     }
+
+    private void promotePawn(char color, int y, int x){
+        LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = layoutInflater.inflate(R.layout.promotion_popup, null);
+        popupWindow = new PopupWindow(popupView,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.showAtLocation(tableLayout, Gravity.CENTER, 0, 0);
+        popupWindow.setOutsideTouchable(false);
+        //display the table
+        TableLayout selectionTable = popupView.findViewById(R.id.selection_table);
+        TableRow row1 = popupView.findViewById(R.id.row1);
+        TableRow row2 = popupView.findViewById(R.id.row2);
+        ImageView imageView1 = popupView.findViewById(R.id.image1);
+        ImageView imageView2 = popupView.findViewById(R.id.image2);
+        ImageView imageView3 = popupView.findViewById(R.id.image3);
+        ImageView imageView4 = popupView.findViewById(R.id.image4);
+
+        AtomicReference<Character> pieceChosen = new AtomicReference<>((char) 0);
+        pieceChosen.set('X'); //indicates no piece chosen yet
+        imageView1.setOnClickListener((v)-> {
+            imageView1.setBackgroundResource(R.drawable.border);
+            imageView2.setBackgroundColor(0);
+            imageView3.setBackgroundColor(0);
+            imageView4.setBackgroundColor(0);
+            pieceChosen.set('B');
+        });
+        imageView2.setOnClickListener((v)-> {
+            imageView2.setBackgroundResource(R.drawable.border);
+            imageView1.setBackgroundColor(0);
+            imageView3.setBackgroundColor(0);
+            imageView4.setBackgroundColor(0);
+            pieceChosen.set('R');
+        });
+        imageView3.setOnClickListener((v)-> {
+            imageView3.setBackgroundResource(R.drawable.border);
+            imageView1.setBackgroundColor(0);
+            imageView2.setBackgroundColor(0);
+            imageView4.setBackgroundColor(0);
+            pieceChosen.set('N');
+        });
+        imageView4.setOnClickListener((v)-> {
+            imageView4.setBackgroundResource(R.drawable.border);
+            imageView1.setBackgroundColor(0);
+            imageView2.setBackgroundColor(0);
+            imageView3.setBackgroundColor(0);
+            pieceChosen.set('Q');
+        });
+
+        if (color == 'w') {
+            imageView1.setImageResource(R.drawable.ic_white_bishop);
+            imageView2.setImageResource(R.drawable.ic_white_rook);
+            imageView3.setImageResource(R.drawable.ic_white_knight);
+            imageView4.setImageResource(R.drawable.ic_white_queen);
+        } else {
+            imageView1.setImageResource(R.drawable.ic_black_bishop);
+            imageView2.setImageResource(R.drawable.ic_black_rook);
+            imageView3.setImageResource(R.drawable.ic_black_knight);
+            imageView4.setImageResource(R.drawable.ic_black_queen);
+        }
+
+        Button ok_button = popupView.findViewById(R.id.ok_button);
+        ok_button.setOnClickListener((l)->{
+            switch (pieceChosen.get()){
+                case 'X':
+                    break;
+                case 'B':
+                    board[y][x] = new Bishop(color);
+                    drawBoard();
+                    popupWindow.dismiss();
+                    break;
+                case 'R':
+                    board[y][x] = new Rook(color);
+                    drawBoard();
+                    popupWindow.dismiss();
+                    break;
+                case 'N':
+                    board[y][x] = new Knight(color);
+                    drawBoard();
+                    popupWindow.dismiss();
+                    break;
+                case 'Q':
+                    board[y][x] = new Queen(color);
+                    drawBoard();
+                    popupWindow.dismiss();
+            }
+        });
+        //SET FLAGS?
+        //popupWindow.dismiss();
+    }
+
 }
