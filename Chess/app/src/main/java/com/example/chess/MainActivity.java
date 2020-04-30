@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TableLayout;
@@ -42,9 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Button aiButton;
     private Button undoButton;
-    private static String undoMove = null;
-    private static Piece lastPieceTaken;
-
+    private static Piece[][] lastBoard;
+    private static PopupWindow popupWindow;
     private ArrayList<String> pastMoves = new ArrayList<String>();
 
     public void saveGame(String filename) {
@@ -375,21 +375,27 @@ public class MainActivity extends AppCompatActivity {
             return false;
             //continue;
         }
+
+        //make a copy of the current board to restore in case of player Undo
+        lastBoard = new Piece[8][8];
+        for(int i = 0; i < 8; i++) {
+            lastBoard[i] = board[i].clone();
+        }
+
         makeMove(move, turn);
 
         //printBoard();
         drawBoard();
         selected = false;
         if (!undoButton.isEnabled()) undoButton.setEnabled(true);
-        undoMove = dest + " " + curr;
+
         currTile = null;
         destTile = null;
 
-        //TODO Display something upon victory
         if (isCheck((turn % 2 == 1) ? 'b' : 'w')) {
             if (isCheckmate((turn % 2 == 1) ? 'b' : 'w')) {
-                Log.d("me","Checkmate\n");
-                Log.d("me", ((turn % 2 == 1) ? "White" : "Black") + " wins");
+                //Log.d("me","Checkmate\n");
+                //Log.d("me", ((turn % 2 == 1) ? "White" : "Black") + " wins");
                 if (turn % 2 == 1) showEndGamePopup('w');
                 else showEndGamePopup('b');
             }
@@ -417,7 +423,6 @@ public class MainActivity extends AppCompatActivity {
         int endRow = 8 - Character.getNumericValue(s.charAt(4));
         Piece start = board[startRow][startCol];
         Piece end = board[endRow][endCol];
-        lastPieceTaken = end;
 
         //check that starting piece exists
         if (start == null) {
@@ -908,18 +913,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void undoMove(){
-        turn--;
         //remove the last turn
         pastMoves.remove(pastMoves.size()-1);
-        makeMove(undoMove, turn);
-        //restore the last piece taken
-        int recoverCol = undoMove.toLowerCase().charAt(0) - 97;
-        int recoverRow = 8 - Character.getNumericValue(undoMove.charAt(1));
-        board[recoverRow][recoverCol] = lastPieceTaken;
-        //now, remove the undo turn added by makeMove();
-        pastMoves.remove(pastMoves.size()-1);
+        //restore the board
+        board = lastBoard;
         drawBoard();
         //update game info
+        turn--;
         if (turn % 2 == 1) turnColor.setText("White's Turn");
         else turnColor.setText("Black's Turn");
         turnNum.setText("Turn#: " + turn);
@@ -931,7 +931,7 @@ public class MainActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = layoutInflater.inflate(R.layout.endgame_popup, null);
-        PopupWindow popupWindow = new PopupWindow(popupView,
+        popupWindow = new PopupWindow(popupView,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.showAtLocation(tableLayout, Gravity.CENTER, 0, 0);
@@ -952,14 +952,40 @@ public class MainActivity extends AppCompatActivity {
         Button yesButton = (Button)popupView.findViewById(R.id.yes_button);
         Button noButton = (Button)popupView.findViewById(R.id.no_button);
         yesButton.setOnClickListener((l)->{
-                saveGame("test");
                 popupWindow.dismiss();
-                recreate();
+                showNamePopup();
             }
         );
         noButton.setOnClickListener((l)->{
             popupWindow.dismiss();
             recreate();
         });
+    }
+
+    private void showNamePopup(){
+        LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = layoutInflater.inflate(R.layout.name_popup, null);
+        popupWindow = new PopupWindow(popupView,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT,
+                ConstraintLayout.LayoutParams.WRAP_CONTENT, true);
+        popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
+
+        EditText nameInput = popupView.findViewById(R.id.input_text);
+        Button okButton = (Button)popupView.findViewById(R.id.ok_button);
+        Button cancelButton = (Button)popupView.findViewById(R.id.cancel_button);
+        okButton.setOnClickListener((l)->{
+            //TODO: check for invalid names (need save to be implemented fully first)
+                    String input = nameInput.getText().toString();
+                    //Log.d("me", "input is " + input);
+                    popupWindow.dismiss();
+                    saveGame(input);
+                    recreate();
+                }
+        );
+        cancelButton.setOnClickListener((l)->{
+                    popupWindow.dismiss();
+                    recreate();
+                }
+        );
     }
 }

@@ -14,4 +14,5 @@
     <string name="no_button">No</string>
     <string name="end_game_message">Game Over</string>
     <string name="save_game_message">Save game?</string>
+    <string name="enter_name_message">Enter a name...</string>
 </resources>
