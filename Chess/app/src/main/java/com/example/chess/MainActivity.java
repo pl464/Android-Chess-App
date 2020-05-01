@@ -971,13 +971,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void promotePawn(char color, int y, int x){
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         View popupView = layoutInflater.inflate(R.layout.promotion_popup, null);
         popupWindow = new PopupWindow(popupView,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
-                ConstraintLayout.LayoutParams.WRAP_CONTENT, true);
+                ConstraintLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.showAtLocation(tableLayout, Gravity.CENTER, 0, 0);
-        popupWindow.setOutsideTouchable(false);
+        //popupWindow.setOutsideTouchable(false);
         //display the table
         TableLayout selectionTable = popupView.findViewById(R.id.selection_table);
         TableRow row1 = popupView.findViewById(R.id.row1);
@@ -988,7 +990,7 @@ public class MainActivity extends AppCompatActivity {
         ImageView imageView4 = popupView.findViewById(R.id.image4);
 
         AtomicReference<Character> pieceChosen = new AtomicReference<>((char) 0);
-        pieceChosen.set('X'); //indicates no piece chosen yet
+        boolean b = false; //indicates that no piece has been chosen yet
         imageView1.setOnClickListener((v)-> {
             imageView1.setBackgroundResource(R.drawable.border);
             imageView2.setBackgroundColor(0);
@@ -1039,21 +1041,26 @@ public class MainActivity extends AppCompatActivity {
                     board[y][x] = new Bishop(color);
                     drawBoard();
                     popupWindow.dismiss();
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     break;
                 case 'R':
                     board[y][x] = new Rook(color);
                     drawBoard();
                     popupWindow.dismiss();
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     break;
                 case 'N':
                     board[y][x] = new Knight(color);
                     drawBoard();
                     popupWindow.dismiss();
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     break;
                 case 'Q':
                     board[y][x] = new Queen(color);
                     drawBoard();
                     popupWindow.dismiss();
+                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+                    break;
             }
         });
         //SET FLAGS?
