@@ -29,7 +29,6 @@ public class PlaybackActivity extends AppCompatActivity {
             FileInputStream fis = openFileInput(filename);
             ObjectInputStream ois = new ObjectInputStream(fis);
             moveList = (ArrayList<String[][]>) ois.readObject();
-            System.out.println(moveList.get(0)[0][0]);
             ois.close();
             fis.close();
         }
@@ -52,21 +51,16 @@ public class PlaybackActivity extends AppCompatActivity {
         String selected = intent.getStringExtra("game");
         loadGame(selected);
 
-        initialize();
         drawBoard();
     }
 
     public void nextMove(View v) {
-        //todo
         turnNumber.setText(getString(R.string.turn_number, ++turn));
         turnColor.setText((turn % 2 == 1) ? "White's Turn" : "Black's Turn");
+        drawBoard();
     }
 
     public void drawBoard() {
-
-    }
-
-    public void initialize() {
-
+        //todo
     }
 }

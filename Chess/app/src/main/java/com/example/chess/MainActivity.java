@@ -95,8 +95,8 @@ public class MainActivity extends AppCompatActivity {
 
         board = new Piece[8][8];
         initialize(); //initializes the underlying board
-        drawBoard(); //draws in tableLayout according to board
         pastMoves.add(boardState());
+        drawBoard(); //draws in tableLayout according to board
     }
 
     //re-draws the display according to board and sets Listeners for each ImageView
