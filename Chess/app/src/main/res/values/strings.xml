@@ -6,7 +6,6 @@
     <string name="undo_button_label">Undo</string>
     <string name="date_sort">Sort Games By Date</string>
     <string name="title_sort">Sort Games By Title</string>
-    <string name="play_recording">Play Recording</string>
     <string name="new_game">New Game</string>
     <string name="previous_games">Previous Games</string>
     <string name="next_move">Next Move</string>

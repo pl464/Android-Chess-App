@@ -14,6 +14,8 @@ public class PlaybackActivity extends AppCompatActivity {
         setContentView(R.layout.activity_playback);
 
         Intent intent = getIntent();
+        String selected = intent.getStringExtra("game");
+        System.out.println(selected);
     }
 
     public void nextMove(View v) {

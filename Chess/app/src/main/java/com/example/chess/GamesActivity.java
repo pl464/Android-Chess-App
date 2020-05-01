@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -33,6 +34,16 @@ public class GamesActivity extends AppCompatActivity {
         adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, names);
         gameList = findViewById(R.id.gameList);
         gameList.setAdapter(adapter);
+
+        gameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selected = (String) parent.getItemAtPosition(position);
+                Intent intent = new Intent(GamesActivity.this, PlaybackActivity.class);
+                intent.putExtra("game", selected);
+                startActivity(intent);
+            }
+        });
     }
 
     public void dateSort(View v) {
@@ -46,9 +57,5 @@ public class GamesActivity extends AppCompatActivity {
     public void titleSort(View v) {
         Arrays.sort(names);
         adapter.notifyDataSetChanged();
-    }
-
-    public void showPlayback(View v) {
-        startActivity(new Intent(this, PlaybackActivity.class));
     }
 }

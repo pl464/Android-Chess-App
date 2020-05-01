@@ -49,15 +49,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void saveGame(String filename) {
         try {
-            //pastMoves.add("move1");
-            //pastMoves.add("move2");
-            //pastMoves.add("move3");
             FileOutputStream fos = openFileOutput(filename, MODE_PRIVATE);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(pastMoves);
             oos.close();
             fos.close();
-            //System.out.println("save successful");
         }
         catch (Exception e) {
             e.printStackTrace();
@@ -71,10 +67,6 @@ public class MainActivity extends AppCompatActivity {
             pastMoves = (ArrayList<String>) ois.readObject();
             ois.close();
             fis.close();
-            //System.out.println("load successful");
-            //for (String s : pastMoves) {
-            //    System.out.println(s);
-            //}
         }
         catch (Exception e) {
             e.printStackTrace();
