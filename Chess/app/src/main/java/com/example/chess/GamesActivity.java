@@ -14,7 +14,6 @@ import java.util.Arrays;
 
 public class GamesActivity extends AppCompatActivity {
 
-    private ListView gameList;
     private ArrayAdapter adapter;
     private File[] files;
     private String[] names;
@@ -26,13 +25,13 @@ public class GamesActivity extends AppCompatActivity {
 
         File dir = this.getFilesDir();
         files = dir.listFiles();
-        names = new String[files.length];
-        for (int i = 0; i < files.length; i++) {
+        names = (files != null) ? new String[files.length] : new String[0];
+        for (int i = 0; i < names.length; i++) {
             names[i] = files[i].getName();
         }
 
-        adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, names);
-        gameList = findViewById(R.id.gameList);
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, names);
+        ListView gameList = findViewById(R.id.gameList);
         gameList.setAdapter(adapter);
 
         gameList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

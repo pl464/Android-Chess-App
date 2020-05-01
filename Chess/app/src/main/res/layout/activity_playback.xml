@@ -7,10 +7,10 @@
     tools:context=".PlaybackActivity">
 
     <TextView
-        android:id="@+id/turnNum"
+        android:id="@+id/turnNumber"
         android:layout_width="90dp"
         android:layout_height="30dp"
-        android:text="@string/turn_num"
+        android:text="@string/turn_number"
         app:layout_constraintBottom_toTopOf="@id/turnColor"
         app:layout_constraintLeft_toLeftOf="@id/boardBorder" />
 
@@ -49,5 +49,5 @@
         android:text="@string/next_move"
         android:onClick="nextMove"
         app:layout_constraintRight_toRightOf="@+id/board"
-        app:layout_constraintTop_toTopOf="@+id/turnNum" />
+        app:layout_constraintTop_toTopOf="@+id/turnNumber" />
 </androidx.constraintlayout.widget.ConstraintLayout>

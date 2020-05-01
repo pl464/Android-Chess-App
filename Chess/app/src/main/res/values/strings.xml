@@ -9,6 +9,7 @@
     <string name="new_game">New Game</string>
     <string name="previous_games">Previous Games</string>
     <string name="next_move">Next Move</string>
+    <string name="turn_number">Turn#: %1$d</string>
     <string name="yes_button">Yes</string>
     <string name="no_button">No</string>
     <string name="end_game_message">Game Over</string>
