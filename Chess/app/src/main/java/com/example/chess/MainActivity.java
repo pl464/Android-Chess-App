@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private Button undoButton;
     private static Piece[][] lastBoard;
     private static PopupWindow popupWindow;
-    private ArrayList<String> pastMoves = new ArrayList<String>();
+    private ArrayList<String[][]> pastMoves = new ArrayList<String[][]>();
 
     public void saveGame(String filename) {
         try {
@@ -58,6 +58,16 @@ public class MainActivity extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public String[][] boardState() {
+        String[][] state = new String[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                state[i][j] = (board[i][j] == null) ? "" : Character.toString(board[i][j].color) + Character.toString(board[i][j].type);
+            }
+        }
+        return state;
     }
     
     @Override
@@ -86,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         board = new Piece[8][8];
         initialize(); //initializes the underlying board
         drawBoard(); //draws in tableLayout according to board
+        pastMoves.add(boardState());
     }
 
     //re-draws the display according to board and sets Listeners for each ImageView
@@ -362,6 +373,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         makeMove(move, turn);
+        pastMoves.add(boardState());
 
         //printBoard();
         drawBoard();
@@ -496,8 +508,7 @@ public class MainActivity extends AppCompatActivity {
         if (start.type == 'p' && endRow == colorRow) {
             promotePawn(start.color, endRow, endCol);
         }
-        
-        pastMoves.add(s);
+
         return;
     }
 
