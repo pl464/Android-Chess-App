@@ -59,19 +59,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-    public void loadGame(String filename) {
-        try {
-            FileInputStream fis = openFileInput(filename);
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            pastMoves = (ArrayList<String>) ois.readObject();
-            ois.close();
-            fis.close();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
