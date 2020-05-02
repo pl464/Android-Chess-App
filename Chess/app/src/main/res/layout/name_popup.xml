@@ -7,6 +7,18 @@
     android:background="#FFFFFF">
 
     <TextView
+        android:id="@+id/duplicate_message"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="@string/duplicate_name_message"
+        android:textColor="#C00000"
+        android:visibility="invisible"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/enter_name_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

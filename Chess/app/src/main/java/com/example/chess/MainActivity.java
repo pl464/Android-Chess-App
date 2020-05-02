@@ -933,6 +933,7 @@ public class MainActivity extends AppCompatActivity {
                 ConstraintLayout.LayoutParams.WRAP_CONTENT, true);
         popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
         //variables for the popup elements
+        TextView duplicateMessage = popupView.findViewById(R.id.duplicate_message);
         EditText nameInput = popupView.findViewById(R.id.input_text);
         Button okButton = popupView.findViewById(R.id.ok_button);
         Button cancelButton = popupView.findViewById(R.id.cancel_button);
@@ -940,6 +941,12 @@ public class MainActivity extends AppCompatActivity {
         okButton.setOnClickListener((l)->{
                 String input = nameInput.getText().toString();
                 //TODO: check for duplicate names
+                /*
+                Something like:
+                    if (duplicate) {
+                        duplicateMessage.setVisibility(View.VISIBLE);
+                    } else {the three lines below}
+                 */
                 popupWindow.dismiss();
                 saveGame(input);
                 recreate();
