@@ -18,7 +18,7 @@
         android:id="@+id/turnColor"
         android:layout_width="90dp"
         android:layout_height="30dp"
-        android:text="@string/turn_color"
+        android:text="@string/turn_color_w"
         app:layout_constraintBottom_toTopOf="@id/boardBorder"
         app:layout_constraintLeft_toLeftOf="@id/boardBorder" />
 

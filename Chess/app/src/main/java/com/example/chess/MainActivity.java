@@ -3,6 +3,7 @@ package com.example.chess;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.os.Bundle;
@@ -19,10 +20,7 @@ import android.widget.PopupWindow;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Random;
@@ -36,16 +34,16 @@ public class MainActivity extends AppCompatActivity {
     private int turn = 1;
     private TextView turnNum;
     private TextView turnColor;
+    private TextView checkMessage;
 
     private static String currTile = null;
     private static String destTile = null;
     private static boolean selected = false;
 
-    private Button aiButton;
     private Button undoButton;
     private static Piece[][] lastBoard;
     private static PopupWindow popupWindow;
-    private ArrayList<String[][]> pastMoves = new ArrayList<String[][]>();
+    private ArrayList<String[][]> pastMoves = new ArrayList<>();
 
     public void saveGame(String filename) {
         try {
@@ -64,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         String[][] state = new String[8][8];
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                state[i][j] = (board[i][j] == null) ? "" : Character.toString(board[i][j].color) + Character.toString(board[i][j].type);
+                state[i][j] = (board[i][j] == null) ? "" : (board[i][j].color) + Character.toString(board[i][j].type);
             }
         }
         return state;
@@ -78,20 +76,15 @@ public class MainActivity extends AppCompatActivity {
         tableLayout = findViewById(R.id.board);
         turnNum = findViewById(R.id.turnNum);
         turnColor = findViewById(R.id.turnColor);
-        aiButton = findViewById(R.id.ai_button);
-        undoButton = findViewById(R.id.undo_button);
+        checkMessage = findViewById(R.id.check_message);
+        checkMessage.setVisibility(View.INVISIBLE);
 
-        aiButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                makeAIMove();
-            }
-        });
+        Button aiButton = findViewById(R.id.ai_button);
+        aiButton.setOnClickListener(v -> makeAIMove());
+
+        undoButton = findViewById(R.id.undo_button);
         undoButton.setEnabled(false);
-        undoButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                undoMove();
-            }
-        });
+        undoButton.setOnClickListener(v -> undoMove());
 
         board = new Piece[8][8];
         initialize(); //initializes the underlying board
@@ -122,10 +115,8 @@ public class MainActivity extends AppCompatActivity {
                 Piece p = board[i-1][j-1];
                 ImageView imageView = new ImageView(this);
                 imageView.setLayoutParams(new TableRow.LayoutParams(tileWidth, tileHeight));
-                //if there is no Piece on the board
-                if (p == null) {}
                 //if the current Piece is black, see what type it is
-                else if (p.color == 'b'){
+                if (p != null && p.color == 'b'){
                     if (p.type == 'B') imageView.setImageResource(R.drawable.ic_black_bishop);
                     else if (p.type == 'K') imageView.setImageResource(R.drawable.ic_black_king);
                     else if (p.type == 'N') imageView.setImageResource(R.drawable.ic_black_knight);
@@ -133,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     else if (p.type == 'Q') imageView.setImageResource(R.drawable.ic_black_queen);
                     else if (p.type == 'R') imageView.setImageResource(R.drawable.ic_black_rook);
                 }
-                else if (p.color == 'w'){
+                else if (p != null && p.color == 'w'){
                     if (p.type == 'B') imageView.setImageResource(R.drawable.ic_white_bishop);
                     else if (p.type == 'K') imageView.setImageResource(R.drawable.ic_white_king);
                     else if (p.type == 'N') imageView.setImageResource(R.drawable.ic_white_knight);
@@ -149,10 +140,11 @@ public class MainActivity extends AppCompatActivity {
                     String id = Integer.toString(v.getId());
                     Piece curr = board[id.charAt(0)-'0'-1][id.charAt(1)-'0'-1];
 
-                    if (currTile == null && p == null) {}
-                    else if (currTile == null) {
-                        if (curr.color != c) return;
-                        else currTile = convert(id);
+                   if (currTile == null) {
+                        if (p != null) {
+                            if (curr.color != c) return;
+                            else currTile = convert(id);
+                        }
                     }
                     else if (destTile == null){
                         curr = board[id.charAt(0)-'0'-1][id.charAt(1)-'0'-1];
@@ -174,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                     if (p != null) imageView.setBackgroundResource(R.drawable.tile_border);
                     selected = true;
                 });
-                //TODO: select the border of drag and drop pieces
+
                 imageView.setOnLongClickListener((v)->{
                     //don't react if the selected piece is the incorrect color
                     char c = (turn % 2 == 1) ? 'w' : 'b';
@@ -196,16 +188,13 @@ public class MainActivity extends AppCompatActivity {
                         case DragEvent.ACTION_DRAG_STARTED:
                             return e.getClipDescription().hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN);
                         case DragEvent.ACTION_DRAG_ENTERED:
-                            return true;
-                        case DragEvent.ACTION_DRAG_LOCATION:
-                            return true;
                         case DragEvent.ACTION_DRAG_EXITED:
+                        case DragEvent.ACTION_DRAG_LOCATION:
                             return true;
                         case DragEvent.ACTION_DROP:
                             ClipData.Item item = e.getClipData().getItemAt(0);
                             currTile = convert(item.getText().toString());
                             destTile = convert(Integer.toString(v.getId()));
-                            Log.d("me", currTile + " " + destTile);
                             //If the destination is itself or if the turn was unsuccessful, undo the drag
                             if (currTile.equals(destTile) || !play(currTile, destTile)){
                                 tableLayout.findViewById(
@@ -227,7 +216,7 @@ public class MainActivity extends AppCompatActivity {
                     return true;
                 });
                 //give this ImageView an id of format 11, 12, ... 88, with 11 being the top-leftmost entry in tableLayout.
-                String id = Integer.toString(i) + Integer.toString(j);
+                String id = Integer.toString(i) + j;
                 imageView.setId(Integer.parseInt(id));
             }
         }
@@ -237,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     private void clearSelection(){
         for (int r = 1; r <= 8; r++){
             for (int s = 1; s <= 8; s++){
-                int temp = Integer.parseInt(Integer.toString(r)+Integer.toString(s));
+                int temp = Integer.parseInt(Integer.toString(r)+ s);
                 tableLayout.findViewById(temp).setBackgroundColor(0);
             }
         }
@@ -286,7 +275,7 @@ public class MainActivity extends AppCompatActivity {
                     else if (j == 3) {
                         board[i][j] = new Queen('b');
                     }
-                    else if (j == 4) {
+                    else {
                         board[i][j] = new King('b');
                     }
                 }
@@ -309,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
                     else if (j == 3) {
                         board[i][j] = new Queen('w');
                     }
-                    else if (j == 4) {
+                    else {
                         board[i][j] = new King('w');
                     }
                 }
@@ -321,32 +310,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //prints the underlying Piece[][] board to Logcat
-    public static void printBoard() {
-        for (int i = 0; i < 8; i++) {
-            String s = "";
-            for (int j = 0; j < 8; j++) {
-                if (board[i][j] == null) {
-                    s += ((i + j) % 2 == 0) ? "   " : "## ";
-                }
-                else {
-                    s+= String.valueOf(board[i][j].color);
-                    s+=board[i][j].type + " ";
-                }
-            }
-            s+= 8 - i;
-            Log.d("me",s);
-        }
-        //System.out.println(" a  b  c  d  e  f  g  h\n");
-    }
-
     //called when a move attempts to be made by the player. returns TRUE if a move was successfully made, FALSE otherwise
     public boolean play(String curr, String dest){
         String move = curr + " " + dest;
-        if (isCheckmate((turn % 2 == 1) ? 'w' : 'b')) {
-            Log.d("me","draw");
-           // break;
-        }
 
         //TODO Implement Draw and Resign options
         if (move.equals("draw")) {
@@ -373,6 +339,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         makeMove(move, turn);
+        if (checkMessage.getVisibility() == View.VISIBLE) checkMessage.setVisibility(View.INVISIBLE);
         pastMoves.add(boardState());
 
         //printBoard();
@@ -389,15 +356,22 @@ public class MainActivity extends AppCompatActivity {
                 //Log.d("me", ((turn % 2 == 1) ? "White" : "Black") + " wins");
                 if (turn % 2 == 1) showEndGamePopup('w');
                 else showEndGamePopup('b');
+                return true;
             }
             else {
-                Log.d("me","Check\n");
+                checkMessage.setVisibility(View.VISIBLE);
+                //Log.d("me","check\n");
             }
         }
         turn++;
-        if (turn % 2 == 1) turnColor.setText("White's Turn");
-        else turnColor.setText("Black's Turn");
-        turnNum.setText("Turn#: " + turn);
+        if (isCheckmate((turn % 2 == 1) ? 'w' : 'b')) {
+            //Log.d("me", "draw");
+            showEndGamePopup('d');
+        }
+        if (turn % 2 == 1) turnColor.setText(R.string.turn_color_w);
+        else turnColor.setText(R.string.turn_color_b);
+        turnNum.setText(R.string.turn_num_gen);
+        turnNum.append(Integer.toString(turn));
         return true;
     }
     /**
@@ -437,7 +411,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         //check that piece movement is legal
-        if (start.validMove(board, startCol, startRow, endCol, endRow, i) == false) {
+        if (!start.validMove(board, startCol, startRow, endCol, endRow, i)) {
             Log.d("me", "This piece can't move here");
             return true;
         }
@@ -460,6 +434,7 @@ public class MainActivity extends AppCompatActivity {
      * @param s The move entered by the user in chess notation.
      * @param i Odd number means white's turn, even number means black's turn.
      */
+    @SuppressLint("Assert")
     public void makeMove(String s, int i) {
         //parse user input
         int startCol = s.toLowerCase().charAt(0) - 97;
@@ -495,12 +470,12 @@ public class MainActivity extends AppCompatActivity {
         //en passant
         if (start.type == 'p') {
             if (Math.abs(endRow - startRow) == 2) {
+                assert start instanceof Pawn;
                 ((Pawn) start).passant = i;
             }
             if (endCol != startCol && end == null) {
                 board[startRow][endCol] = null;
             }
-
         }
 
         //pawn promotion
@@ -508,8 +483,6 @@ public class MainActivity extends AppCompatActivity {
         if (start.type == 'p' && endRow == colorRow) {
             promotePawn(start.color, endRow, endCol);
         }
-
-        return;
     }
 
     /**
@@ -707,7 +680,7 @@ public class MainActivity extends AppCompatActivity {
      * @return Returns an ArrayList of integer arrays.
      */
     public ArrayList<int[]> getPossMoves(Piece p, int yPos, int xPos){
-        ArrayList<int[]> possMoves = new ArrayList<int[]>();
+        ArrayList<int[]> possMoves = new ArrayList<>();
         switch (p.type) {
             case 'B':
                 String[] B_Directions = {"NW", "NE", "SE", "SW"};
@@ -838,7 +811,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void makeAIMove(){
         //get a list of possible moves
-        ArrayList<String[]> options = new ArrayList<String[]>();
+        ArrayList<String[]> options = new ArrayList<>();
         char c = (turn % 2 == 1) ? 'w' : 'b';
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
@@ -846,7 +819,7 @@ public class MainActivity extends AppCompatActivity {
                 if (p0 == null || p0.color != c) {
                     continue;
                 }
-                String currTile = Integer.toString(i+1) + Integer.toString(j+1);
+                String currTile = Integer.toString(i+1) + (j + 1);
                 String[] move = new String[2];
                 move[0] = currTile;
                 ArrayList<int[]> possMoves = getPossMoves(p0, i, j);
@@ -860,10 +833,8 @@ public class MainActivity extends AppCompatActivity {
                     if (isCheck(c)) {
                         board[i][j] = p0;
                         board[testY][testX] = p1;
-                        continue;
-                    }
-                    else {
-                        move[1] = Integer.toString(testY+1) + Integer.toString(testX+1);
+                    } else {
+                        move[1] = Integer.toString(testY+1) + (testX + 1);
                         //Log.d("me", "Adding move " + move[0] + " " + move[1]);
                         options.add(move);
                         board[i][j] = p0;
@@ -878,9 +849,7 @@ public class MainActivity extends AppCompatActivity {
         int value = rand.nextInt(numOptions);
         String[] randMove = options.get(value);
         //make the move
-        //Log.d("me", "attempting random move " + randMove[0] + randMove[1]);
         play(convert(randMove[0]), convert(randMove[1]));
-        return;
     }
 
     public void undoMove(){
@@ -891,9 +860,10 @@ public class MainActivity extends AppCompatActivity {
         drawBoard();
         //update game info
         turn--;
-        if (turn % 2 == 1) turnColor.setText("White's Turn");
-        else turnColor.setText("Black's Turn");
-        turnNum.setText("Turn#: " + turn);
+        if (turn % 2 == 1) turnColor.setText(R.string.turn_color_w);
+        else turnColor.setText(R.string.turn_color_b);
+        turnNum.setText(R.string.turn_num_gen);
+        turnNum.append(Integer.toString(turn));
         undoButton.setEnabled(false);
     }
 
@@ -901,7 +871,8 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = layoutInflater.inflate(R.layout.endgame_popup, null);
+        assert layoutInflater != null;
+        @SuppressLint("InflateParams") View popupView = layoutInflater.inflate(R.layout.endgame_popup, null);
         popupWindow = new PopupWindow(popupView,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT);
@@ -910,18 +881,18 @@ public class MainActivity extends AppCompatActivity {
         TextView endGameMessage = popupView.findViewById(R.id.end_game_message);
         switch (code){
             case 'w':
-                endGameMessage.setText("White wins!");
+                endGameMessage.setText(R.string.white_wins);
                 break;
             case 'b':
-                endGameMessage.setText("Black wins!");
+                endGameMessage.setText(R.string.black_wins);
                 break;
             case 'd':
-                endGameMessage.setText("Draw!");
+                endGameMessage.setText(R.string.draw);
                 break;
         }
 
-        Button yesButton = (Button)popupView.findViewById(R.id.yes_button);
-        Button noButton = (Button)popupView.findViewById(R.id.no_button);
+        Button yesButton = popupView.findViewById(R.id.yes_button);
+        Button noButton = popupView.findViewById(R.id.no_button);
         yesButton.setOnClickListener((l)->{
                 popupWindow.dismiss();
                 showNamePopup();
@@ -935,17 +906,19 @@ public class MainActivity extends AppCompatActivity {
 
     private void showNamePopup(){
         LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = layoutInflater.inflate(R.layout.name_popup, null);
+        assert layoutInflater != null;
+        @SuppressLint("InflateParams") View popupView = layoutInflater.inflate(R.layout.name_popup, null);
         popupWindow = new PopupWindow(popupView,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT, true);
         popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
 
         EditText nameInput = popupView.findViewById(R.id.input_text);
-        Button okButton = (Button)popupView.findViewById(R.id.ok_button);
-        Button cancelButton = (Button)popupView.findViewById(R.id.cancel_button);
+        Button okButton = popupView.findViewById(R.id.ok_button);
+        Button cancelButton = popupView.findViewById(R.id.cancel_button);
+
         okButton.setOnClickListener((l)->{
-            //TODO: check for invalid names (need save to be implemented fully first)
+            //TODO: check for invalid names
                     String input = nameInput.getText().toString();
                     //Log.d("me", "input is " + input);
                     popupWindow.dismiss();
@@ -964,23 +937,21 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
-        View popupView = layoutInflater.inflate(R.layout.promotion_popup, null);
+        assert layoutInflater != null;
+        @SuppressLint("InflateParams") View popupView = layoutInflater.inflate(R.layout.promotion_popup, null);
         popupWindow = new PopupWindow(popupView,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT);
         popupWindow.showAtLocation(tableLayout, Gravity.CENTER, 0, 0);
         //popupWindow.setOutsideTouchable(false);
         //display the table
-        TableLayout selectionTable = popupView.findViewById(R.id.selection_table);
-        TableRow row1 = popupView.findViewById(R.id.row1);
-        TableRow row2 = popupView.findViewById(R.id.row2);
+
         ImageView imageView1 = popupView.findViewById(R.id.image1);
         ImageView imageView2 = popupView.findViewById(R.id.image2);
         ImageView imageView3 = popupView.findViewById(R.id.image3);
         ImageView imageView4 = popupView.findViewById(R.id.image4);
 
         AtomicReference<Character> pieceChosen = new AtomicReference<>((char) 0);
-        boolean b = false; //indicates that no piece has been chosen yet
         imageView1.setOnClickListener((v)-> {
             imageView1.setBackgroundResource(R.drawable.border);
             imageView2.setBackgroundColor(0);
@@ -1053,8 +1024,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
             }
         });
-        //SET FLAGS?
-        //popupWindow.dismiss();
     }
 
 }

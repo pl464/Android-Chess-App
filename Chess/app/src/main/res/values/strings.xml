@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Chess</string>
     <string name="turn_num">Turn#: 1</string>
-    <string name="turn_color">White\'s Turn</string>
+    <string name="turn_color_w">White\'s Turn</string>
+    <string name="turn_color_b">Black\'s Turn</string>
+    <string name="turn_num_gen">Turn#: </string>
     <string name="ai_button_label">AI Move</string>
     <string name="undo_button_label">Undo</string>
     <string name="date_sort">Sort Games By Date</string>
@@ -12,8 +14,12 @@
     <string name="turn_number">Turn#: %1$d</string>
     <string name="yes_button">Yes</string>
     <string name="no_button">No</string>
+    <string name="white_wins">White wins!</string>
+    <string name="black_wins">Black wins!</string>
+    <string name="draw">Draw!</string>
     <string name="end_game_message">Game Over</string>
     <string name="save_game_message">Save game?</string>
     <string name="enter_name_message">Enter a name...</string>
     <string name="promotion_message">Pick a piece for your pawn to promote to...</string>
+    <string name="check">Check</string>
 </resources>
