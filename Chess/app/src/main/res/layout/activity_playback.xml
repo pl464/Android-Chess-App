@@ -7,6 +7,17 @@
     tools:context=".PlaybackActivity">
 
     <TextView
+        android:id="@+id/gameResult"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/draw"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        app:layout_constraintTop_toBottomOf="@id/boardBorder"
+        app:layout_constraintLeft_toLeftOf="@id/boardBorder"
+        app:layout_constraintRight_toRightOf="@id/boardBorder"/>
+
+    <TextView
         android:id="@+id/turnNumber"
         android:layout_width="90dp"
         android:layout_height="30dp"

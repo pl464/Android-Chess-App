@@ -20,6 +20,7 @@ public class PlaybackActivity extends AppCompatActivity {
     private TableLayout tableLayout;
     private TextView turnNumber;
     private TextView turnColor;
+    private TextView gameResult;
 
     private int turn = 1;
     private ArrayList<String[][]> moveList = new ArrayList<String[][]>();
@@ -42,6 +43,9 @@ public class PlaybackActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playback);
 
+        gameResult = findViewById(R.id.gameResult);
+        gameResult.setVisibility(View.INVISIBLE);
+
         tableLayout = findViewById(R.id.board);
         turnNumber = findViewById(R.id.turnNumber);
         turnNumber.setText(getString(R.string.turn_number, turn));
@@ -56,9 +60,21 @@ public class PlaybackActivity extends AppCompatActivity {
     }
 
     public void nextMove(View v) {
-        if (moveList.isEmpty()) {
-            //todo
-            return;
+        switch (moveList.get(0)[0][0]) {
+            case "white":
+                gameResult.setText(R.string.white_wins);
+                gameResult.setVisibility(View.VISIBLE);
+                return;
+            case "black":
+                gameResult.setText(R.string.black_wins);
+                gameResult.setVisibility(View.VISIBLE);
+                return;
+            case "draw":
+                gameResult.setText(R.string.draw);
+                gameResult.setVisibility(View.VISIBLE);
+                return;
+            default:
+                break;
         }
         turnNumber.setText(getString(R.string.turn_number, ++turn));
         turnColor.setText((turn % 2 == 1) ? "White's Turn" : "Black's Turn");

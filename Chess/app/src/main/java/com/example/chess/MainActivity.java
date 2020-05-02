@@ -900,15 +900,22 @@ public class MainActivity extends AppCompatActivity {
         popupWindow.showAtLocation(tableLayout, Gravity.CENTER, 0, 0);
 
         TextView endGameMessage = popupView.findViewById(R.id.end_game_message);
+        String[][] result = new String[8][8];
         switch (code){
             case 'w':
                 endGameMessage.setText(R.string.white_wins);
+                result[0][0] = "white";
+                pastMoves.add(result);
                 break;
             case 'b':
                 endGameMessage.setText(R.string.black_wins);
+                result[0][0] = "black";
+                pastMoves.add(result);
                 break;
             case 'd':
                 endGameMessage.setText(R.string.draw);
+                result[0][0] = "draw";
+                pastMoves.add(result);
                 break;
         }
 
