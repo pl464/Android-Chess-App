@@ -359,6 +359,11 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
             else {
+                if (turn % 2 == 1) {
+                    checkMessage.setText(R.string.black_check);
+                } else {
+                    checkMessage.setText(R.string.white_check);
+                }
                 checkMessage.setVisibility(View.VISIBLE);
                 //Log.d("me","check\n");
             }
@@ -859,6 +864,18 @@ public class MainActivity extends AppCompatActivity {
         board = lastBoard;
         drawBoard();
         //update game info
+        if (checkMessage.getVisibility() == View.VISIBLE) {
+            checkMessage.setVisibility(View.INVISIBLE);
+        } else {
+            if (isCheck((turn % 2 == 1) ? 'b' : 'w')) {
+                if (turn % 2 == 1) {
+                    checkMessage.setText(R.string.black_check);
+                } else {
+                    checkMessage.setText(R.string.white_check);
+                }
+                checkMessage.setVisibility(View.VISIBLE);
+            }
+        }
         turn--;
         if (turn % 2 == 1) turnColor.setText(R.string.turn_color_w);
         else turnColor.setText(R.string.turn_color_b);
