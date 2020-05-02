@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
+import androidx.fragment.app.DialogFragment;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.os.Bundle;
@@ -31,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private TableLayout tableLayout;
     private static Piece[][] board;
 
-    private int turn = 1;
+    public int turn = 1;
     private TextView turnNum;
     private TextView turnColor;
     private TextView checkMessage;
@@ -85,6 +86,17 @@ public class MainActivity extends AppCompatActivity {
         undoButton = findViewById(R.id.undo_button);
         undoButton.setEnabled(false);
         undoButton.setOnClickListener(v -> undoMove());
+
+        Button drawButton = findViewById(R.id.draw_button);
+        drawButton.setOnClickListener(v -> {
+            DialogFragment newFragment = new DrawDialogFragment();
+            newFragment.show(getSupportFragmentManager(), "draw");
+        });
+        Button resignButton = findViewById(R.id.resign_button);
+        resignButton.setOnClickListener(v -> {
+            DialogFragment newFragment = new ResignDialogFragment();
+            newFragment.show(getSupportFragmentManager(), "resign");
+        });
 
         board = new Piece[8][8];
         initialize(); //initializes the underlying board
@@ -313,16 +325,6 @@ public class MainActivity extends AppCompatActivity {
     //called when a move attempts to be made by the player. returns TRUE if a move was successfully made, FALSE otherwise
     public boolean play(String curr, String dest){
         String move = curr + " " + dest;
-
-        //TODO Implement Draw and Resign options
-        if (move.equals("draw")) {
-           // break;
-        }
-        if (move.equals("resign")) {
-            System.out.print(((turn % 2 == 1) ? "Black" : "White") + " wins");
-           // break;
-        }
-
         //move the piece if allowed and show the updated chessboard
         if (isIllegal(move, turn)) {
             //Log.d("me","Illegal move " + move + " try again\n");
@@ -884,7 +886,7 @@ public class MainActivity extends AppCompatActivity {
         undoButton.setEnabled(false);
     }
 
-    private void showEndGamePopup(char code){
+    public void showEndGamePopup(char code){
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
         LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -922,6 +924,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showNamePopup(){
+        //displays the popup
         LayoutInflater layoutInflater = (LayoutInflater)getBaseContext().getSystemService(LAYOUT_INFLATER_SERVICE);
         assert layoutInflater != null;
         @SuppressLint("InflateParams") View popupView = layoutInflater.inflate(R.layout.name_popup, null);
@@ -929,20 +932,20 @@ public class MainActivity extends AppCompatActivity {
                 ConstraintLayout.LayoutParams.WRAP_CONTENT,
                 ConstraintLayout.LayoutParams.WRAP_CONTENT, true);
         popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
-
+        //variables for the popup elements
         EditText nameInput = popupView.findViewById(R.id.input_text);
         Button okButton = popupView.findViewById(R.id.ok_button);
         Button cancelButton = popupView.findViewById(R.id.cancel_button);
-
+        //set what the OK button does
         okButton.setOnClickListener((l)->{
-            //TODO: check for invalid names
-                    String input = nameInput.getText().toString();
-                    //Log.d("me", "input is " + input);
-                    popupWindow.dismiss();
-                    saveGame(input);
-                    recreate();
-                }
+                String input = nameInput.getText().toString();
+                //TODO: check for duplicate names
+                popupWindow.dismiss();
+                saveGame(input);
+                recreate();
+            }
         );
+        //dismiss the popup if Cancel is clicked
         cancelButton.setOnClickListener((l)->{
                     popupWindow.dismiss();
                     recreate();

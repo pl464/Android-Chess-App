@@ -24,4 +24,8 @@
     <string name="check">Check</string>
     <string name="black_check">Black is in check!</string>
     <string name="white_check">White is in check!</string>
+    <string name="draw_button_label">Draw</string>
+    <string name="resign_button_label">Resign</string>
+    <string name="draw_dialog_message">Are you sure you want to declare a draw?</string>
+    <string name="resign_dialog_message">Are you sure you want to resign?</string>
 </resources>
