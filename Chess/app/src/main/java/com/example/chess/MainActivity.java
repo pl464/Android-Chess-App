@@ -21,6 +21,8 @@ import android.widget.PopupWindow;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -933,23 +935,26 @@ public class MainActivity extends AppCompatActivity {
                 ConstraintLayout.LayoutParams.WRAP_CONTENT, true);
         popupWindow.showAtLocation(popupView, Gravity.CENTER, 0, 0);
         //variables for the popup elements
-        TextView duplicateMessage = popupView.findViewById(R.id.duplicate_message);
+        TextView errorMessage = popupView.findViewById(R.id.error_message);
         EditText nameInput = popupView.findViewById(R.id.input_text);
         Button okButton = popupView.findViewById(R.id.ok_button);
         Button cancelButton = popupView.findViewById(R.id.cancel_button);
         //set what the OK button does
         okButton.setOnClickListener((l)->{
-                String input = nameInput.getText().toString();
-                //TODO: check for duplicate names
-                /*
-                Something like:
-                    if (duplicate) {
-                        duplicateMessage.setVisibility(View.VISIBLE);
-                    } else {the three lines below}
-                 */
-                popupWindow.dismiss();
-                saveGame(input);
-                recreate();
+                String input = nameInput.getText().toString().trim();
+                if (input.isEmpty()) {
+                    errorMessage.setText("Name cannot be blank.");
+                    errorMessage.setVisibility(View.VISIBLE);
+                }
+                else if (this.getFileStreamPath(input).exists()) {
+                    errorMessage.setText("This name already exists.");
+                    errorMessage.setVisibility(View.VISIBLE);
+                }
+                else {
+                    popupWindow.dismiss();
+                    saveGame(input);
+                    recreate();
+                }
             }
         );
         //dismiss the popup if Cancel is clicked

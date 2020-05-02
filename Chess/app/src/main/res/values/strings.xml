@@ -20,9 +20,9 @@
     <string name="end_game_message">Game Over</string>
     <string name="save_game_message">Save game?</string>
     <string name="enter_name_message">Enter a name…</string>
-    <string name="duplicate_name_message">Duplicate name already exists.</string>
+    <string name="error_message">Name cannot be blank.</string>
     <string name="promotion_message">Pick a piece for your pawn to promote to…</string>
-    <string name="check">Check</string>
+    <string name="check">White is in check!</string>
     <string name="black_check">Black is in check!</string>
     <string name="white_check">White is in check!</string>
     <string name="draw_button_label">Draw</string>

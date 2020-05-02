@@ -10,15 +10,13 @@
         android:id="@+id/check_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="8dp"
         android:text="@string/check"
         android:textColor="#000000"
         android:textSize="18sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/board" />
+        app:layout_constraintLeft_toRightOf="@id/boardBorder"
+        app:layout_constraintRight_toLeftOf="@id/boardBorder"
+        app:layout_constraintTop_toBottomOf="@id/boardBorder" />
 
     <Button
         android:id="@+id/draw_button"
@@ -26,18 +24,17 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="@string/draw_button_label"
-        app:layout_constraintRight_toLeftOf="@id/resign_button"
-        app:layout_constraintTop_toBottomOf="@id/board" />
+        app:layout_constraintLeft_toLeftOf="@id/boardBorder"
+        app:layout_constraintTop_toBottomOf="@id/boardBorder" />
 
     <Button
         android:id="@+id/resign_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginRight="16dp"
         android:text="@string/resign_button_label"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/board" />
+        app:layout_constraintRight_toRightOf="@id/boardBorder"
+        app:layout_constraintTop_toBottomOf="@id/boardBorder" />
 
     <TextView
         android:id="@+id/turnNum"
@@ -79,23 +76,21 @@
         android:id="@+id/ai_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/ai_button_label"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@+id/board"
-        app:layout_constraintStart_toEndOf="@+id/turnNum"
-        tools:layout_constraintBottom_toTopOf="@id/board" />
+        app:layout_constraintBottom_toTopOf="@+id/boardBorder"
+        app:layout_constraintRight_toRightOf="@id/boardBorder"
+        app:layout_constraintLeft_toLeftOf="@id/boardBorder" />
 
     <Button
         android:id="@+id/undo_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="16dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/undo_button_label"
         android:textAllCaps="false"
-        app:layout_constraintBottom_toTopOf="@id/board"
-        app:layout_constraintLeft_toRightOf="@id/ai_button" />
+        app:layout_constraintBottom_toTopOf="@id/boardBorder"
+        app:layout_constraintRight_toRightOf="@id/boardBorder" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
