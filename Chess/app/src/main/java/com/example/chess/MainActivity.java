@@ -339,7 +339,20 @@ public class MainActivity extends AppCompatActivity {
         //make a copy of the current board to restore in case of player Undo
         lastBoard = new Piece[8][8];
         for(int i = 0; i < 8; i++) {
-            lastBoard[i] = board[i].clone();
+            for (int j = 0; j < 8; j++) {
+                lastBoard[i][j] = board[i][j];
+                //for each King and Rook piece, make a deep copy of canCastle property
+                if (board[i][j] == null) continue;
+                if (board[i][j].type == 'K'){
+                    King newKing = new King(board[i][j].color);
+                    newKing.canCastle = ((King)board[i][j]).canCastle;
+                    lastBoard[i][j] = newKing;
+                } else if (board[i][j].type == 'R'){
+                    Rook newRook = new Rook(board[i][j].color);
+                    newRook.canCastle = ((Rook)board[i][j]).canCastle;
+                    lastBoard[i][j] = newRook;
+                }
+            }
         }
 
         makeMove(move, turn);
@@ -383,6 +396,8 @@ public class MainActivity extends AppCompatActivity {
         turnNum.append(Integer.toString(turn));
         return true;
     }
+
+
     /**
      * Method to determine whether a move is illegal.
      * @param s The move entered by the user in chess notation.
@@ -437,7 +452,24 @@ public class MainActivity extends AppCompatActivity {
         board[endRow][endCol] = end;
         return false;
     }
-
+//prints the underlying Piece[][] board to Logcat
+public static void printBoard() {
+for (int i = 0; i < 8; i++) {
+String s = "";
+for (int j = 0; j < 8; j++) {
+if (board[i][j] == null) {
+s += ((i + j) % 2 == 0) ? "   " : "## ";
+}
+else {
+s+= String.valueOf(board[i][j].color);
+s+=board[i][j].type + " ";
+}
+}
+s+= 8 - i;
+Log.d("me",s);
+}
+//System.out.println(" a  b  c  d  e  f  g  h\n");
+}
     /**
      * Method to make a move on the chessboard.
      * @param s The move entered by the user in chess notation.
@@ -865,7 +897,15 @@ public class MainActivity extends AppCompatActivity {
         //remove the last turn
         pastMoves.remove(pastMoves.size()-1);
         //restore the board
+        Log.d("me", String.valueOf(lastBoard[7][4].type));
+        if (((King)lastBoard[7][4]).canCastle) {
+            Log.d("me", "The white King can castle");
+        }
         board = lastBoard;
+        if (((King)lastBoard[7][4]).canCastle) {
+            Log.d("me", "The white King can castle");
+        }
+
         drawBoard();
         //update game info
         if (checkMessage.getVisibility() == View.VISIBLE) {

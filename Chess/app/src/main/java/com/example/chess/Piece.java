@@ -8,7 +8,7 @@ import java.io.*;
  * @author Patrick Lee
  * Abstract class to represent a chess piece.
  */
-public abstract class Piece {
+public abstract class Piece implements Cloneable{
     /**
      * Character to track whether this piece is white or black.
      */
@@ -39,4 +39,8 @@ public abstract class Piece {
      * @return Returns true if the move is valid, false if the move is invalid.
      */
     public abstract boolean validMove(Piece[][] board, int startCol, int startRow, int endCol, int endRow, int turn);
+
+    public Object clone()throws CloneNotSupportedException{
+        return super.clone();
+    }
 }
