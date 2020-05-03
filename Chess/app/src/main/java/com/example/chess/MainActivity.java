@@ -415,20 +415,20 @@ public class MainActivity extends AppCompatActivity {
 
         //check that starting piece exists
         if (start == null) {
-            Log.d("me", "start is null");
+            //Log.d("me", "start is null");
             return true;
         }
 
         //check that starting piece is player's color
         char c = (i % 2 == 1) ? 'w' : 'b';
         if (start.color != c) {
-            Log.d("me", "it's not this color's turn. the color is " + start.color + " but it's supposed to be " + c);
+            //Log.d("me", "it's not this color's turn. the color is " + start.color + " but it's supposed to be " + c);
             return true;
         }
 
         //check that ending piece, if exists, is opponent's color
         if (end != null && end.color == c) {
-            Log.d("me", "This piece is of your own color");
+            //Log.d("me", "This piece is of your own color");
             currTile = s.charAt(3) + "" + s.charAt(4); //if this piece is the player's own color, make this the piece of interest
             destTile = null;
             return true;
@@ -436,7 +436,7 @@ public class MainActivity extends AppCompatActivity {
 
         //check that piece movement is legal
         if (!start.validMove(board, startCol, startRow, endCol, endRow, i)) {
-            Log.d("me", "This piece can't move here");
+            //Log.d("me", "This piece can't move here");
             return true;
         }
 
@@ -452,24 +452,6 @@ public class MainActivity extends AppCompatActivity {
         board[endRow][endCol] = end;
         return false;
     }
-//prints the underlying Piece[][] board to Logcat
-public static void printBoard() {
-for (int i = 0; i < 8; i++) {
-String s = "";
-for (int j = 0; j < 8; j++) {
-if (board[i][j] == null) {
-s += ((i + j) % 2 == 0) ? "   " : "## ";
-}
-else {
-s+= String.valueOf(board[i][j].color);
-s+=board[i][j].type + " ";
-}
-}
-s+= 8 - i;
-Log.d("me",s);
-}
-//System.out.println(" a  b  c  d  e  f  g  h\n");
-}
     /**
      * Method to make a move on the chessboard.
      * @param s The move entered by the user in chess notation.
