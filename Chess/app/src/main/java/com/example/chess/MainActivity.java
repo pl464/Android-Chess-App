@@ -897,14 +897,7 @@ Log.d("me",s);
         //remove the last turn
         pastMoves.remove(pastMoves.size()-1);
         //restore the board
-        Log.d("me", String.valueOf(lastBoard[7][4].type));
-        if (((King)lastBoard[7][4]).canCastle) {
-            Log.d("me", "The white King can castle");
-        }
         board = lastBoard;
-        if (((King)lastBoard[7][4]).canCastle) {
-            Log.d("me", "The white King can castle");
-        }
 
         drawBoard();
         //update game info
