@@ -1079,28 +1079,23 @@ Log.d("me",s);
                     break;
                 case 'B':
                     board[y][x] = new Bishop(color);
-                    drawBoard();
-                    popupWindow.dismiss();
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     break;
                 case 'R':
                     board[y][x] = new Rook(color);
-                    drawBoard();
-                    popupWindow.dismiss();
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     break;
                 case 'N':
                     board[y][x] = new Knight(color);
-                    drawBoard();
-                    popupWindow.dismiss();
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     break;
                 case 'Q':
                     board[y][x] = new Queen(color);
-                    drawBoard();
-                    popupWindow.dismiss();
-                    getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
                     break;
+            }
+            if (pieceChosen.get() != 'X'){
+                pastMoves.remove(pastMoves.size()-1);
+                pastMoves.add(boardState());
+                drawBoard();
+                popupWindow.dismiss();
+                getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             }
         });
     }
